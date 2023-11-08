@@ -1,0 +1,3 @@
+#!/bin/bash
+
+uwsgi --ini Monitor_uwsgi.ini
