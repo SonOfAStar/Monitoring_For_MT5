@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Мониторинг счетов
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+  <h2>
+       Мониторинг состояния счетов, состояние на {{my_time}}.
+  </h2>
+</div>
+<br>
+
+<table class="table table-bordered table-sm">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Статус</th>
+          <th>Владелец счёта</th>
+          <th>Тип счёта</th>
+          <th>Ответственный</th>
+          <th>Текущий баланс, руб</th>
+          <th>Изменение баланса, руб</th>
+          <th>Изменение баланса, %</th>
+          <th>Время</th>
+          <th>Max риск, %</th>
+          <th>Риск, %</th>
+          <th>Комментарий</th>
+          <th>Символ</th>
+          <th>ID робота</th>
+          <th>Объём</th>
+          <th>Стоплосс</th>
+          <th>Цена входа</th>
+          <th>Риск, руб</th>
+        </tr>
+      </thead>
+    <tbody>
+    {% for el in account_info_table %}
+    {% if el.status == "OK" %}
+        <tr>
+    {% elif el.status == "WARN" %}
+        <tr class="table-warning">
+    {% elif el.status == "ERR" %}
+        <tr class="table-danger">
+    {% endif %}
+        <td>
+            {{ forloop.counter }}
+        </td>
+        <td>
+            <!-- status -->
+            {{ el.status }}
+        </td>
+        <td>
+            <!-- owner -->
+            <p data-toggle="tooltip" data-container="p" title="{{ el.number }}">
+                {{ el.owner }}
+            </p >
+        </td>
+        <td>
+            <!-- account type -->
+            {{ el.type }}
+        </td>
+        <td>
+            <!-- responsible person -->
+            {{ el.responsible }}
+        </td>
+        <td>
+            <figure class="text-end">
+                <!-- balance -->
+                {{ el.balance_str }}
+            </figure>
+        </td>
+        <td>
+            <figure class="text-end">
+                <!-- balance change -->
+                <p data-toggle="tooltip" data-container="p" title="{{ el.reported_balance_deal }}">
+                {{ el.balance_change_str }}
+                </p >
+            </figure>
+        </td>
+        <td>
+            <figure class="text-end">
+                <!-- balance change percent -->
+                {{ el.balance_change_prcnt_str }}
+            </figure>
+        </td>
+        <td>
+            <!-- last update -->
+            {{ el.last_update_str }}
+        </td>
+        <td>
+            <!-- max risk -->
+            {{ el.max_risk }}
+        </td>
+        <td>
+            <!-- current_risk -->
+            {{ el.sum_risk_percent_str }}
+        </td>
+        <td>
+            {% if el.commentary != "" %}
+            <p data-toggle="tooltip" data-container="p" title="{{ el.commentary }}">
+                {{ el.commentary_snapshot }}
+            </p >
+            {% endif %}
+        </td>
+
+        <td colspan="6">
+            <table class="table table-bordered table-sm">
+                {% for deal in el.deals %}
+                    {% if deal.magic == 0 %}
+                        <tr class="table-warning">
+                    {% elif deal.sl == 0.0 %}
+                        <tr class="table-danger">
+                    {% else %}
+                        <tr>
+                    {% endif %}
+                        <td>{{ deal.symbol }}</td>
+                        <td>{{ deal.magic_str }}</td>
+                        <td><figure class="text-end">{{ deal.volume_str }}</figure></td>
+                        <td><figure class="text-end">{{ deal.sl_str }}</figure></td>
+                        <td><figure class="text-end">{{ deal.price_str }}</figure></td>
+                        <td><figure class="text-end">{{ deal.risk_str }}</figure></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+    {% endfor %}
+
+  </tbody>
+</table>
+
+{% endblock %}

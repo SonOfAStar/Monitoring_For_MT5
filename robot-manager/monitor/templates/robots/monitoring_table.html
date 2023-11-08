@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}
+MONITOR
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    function SendRobotCmd(robot_id, robot_cmd) {
+        let request = new XMLHttpRequest();
+        let url = "/dispatcher/send_cmd";
+        let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Set csrf_token !!!
+        let params = "robot_id=" + robot_id + "&robot_cmd=" + robot_cmd + "&csrfmiddlewaretoken=" + csrftoken;
+
+        // Асинхронный POST запрос по адресу url
+        request.open("POST", url, true);
+        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        // Добавляем обработчик события для получения асинхронного ответа
+        request.addEventListener("readystatechange", () => {
+
+          if(request.readyState === 4) {
+                    alert(request.responseText);
+                    location.reload();
+                    return false;
+          }
+        });
+        //      Выполняем запрос.
+        request.send(params);
+    }
+    </script>
+
+{% endblock %}
+
+{% block content %}
+<br>
+<figure class="text-end">
+    <button class="btn btn-success" onclick="SendRobotCmd(0, 'startAllRobots')">Start All</button>
+    <button class="btn btn-danger" onclick="SendRobotCmd(0, 'stopAllRobots')">Stop all</button>
+</figure>
+
+<table class="table table-sm">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Статус</th>
+      <th>ID робота</th>
+      <th>Имя робота</th>
+      <th>Символ</th>
+      <th>Таймфрейм</th>
+      <th>Объём сделки</th>
+      <th>Время</th>
+      <th>Владелец</th>
+      <th>Счёт</th>
+      <th>Брокер</th>
+      <th>Коментарий</th>
+      <th>Включён</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for el in display_rows %}
+    {% if el.status == "OK" and el.msg_volume != 0.00 %}
+        <tr class="table-success">
+    {% elif el.status == "OK" %}
+        <tr>
+    {% elif el.status == "WARN" %}
+        <tr class="table-warning">
+    {% elif el.status == "ERR" %}
+        <tr class="table-danger">
+    {% elif el.status == "OFF" %}
+        <tr class="table-secondary">
+    {% elif el.status == "DEMO" %}
+        <tr class="table-info">
+    {% endif %}
+        <th>
+            {{ forloop.counter }}
+        </th>
+        <td>
+            <!-- status -->
+            {{ el.status }}
+        </td>
+        <td>
+            <!-- robot id -->
+            {{ el.id }}
+        </td>
+        <td>
+            <!-- name -->
+            <a href="/admin/req_reciever/robot/{{el.id}}/change/">
+                {{ el.name }}
+            </a>
+        </td>
+        <td>
+            <!-- symbol -->
+            {{ el.db_symbol }}
+        </td>
+        <td>
+            <!-- timeframe -->
+            {{ el.db_timeframe }}
+        </td>
+        <td>
+            <!-- volume -->
+            {{ el.msg_volume }}
+        </td>
+        <td>
+            <!-- update time -->
+            {% if el.msg_time >= el.ini_time %}
+                {{ el.msg_time }}
+            {% else %}
+                {{ el.ini_time }}
+            {% endif %}
+        </td>
+        <td>
+            <!-- owner -->
+            {{ el.owner }}
+        </td>
+        <td>
+            <!-- account -->
+            {{ el.db_account }}
+        </td>
+        <td>
+            <!-- broker -->
+            {{ el.broker }}
+        </td>
+        <td>
+            <!-- commentary -->
+            <!--<textarea style="text-align:left;" cols="40" rows="5" wrap="soft" readonly="yes">-->
+            {% if el.commentary != "" %}
+            <p data-toggle="tooltip" data-container="p" title="{{ el.commentary }}">
+                {{ el.commentary_snapshot }}
+            </p >
+            {% endif %}
+            <!--</textarea>-->
+        </td>
+        <td>
+            <!-- active -->
+            {% if el.active %}
+                {% if el.is_demo %}
+                    <button class="btn btn-primary" onclick="SendRobotCmd({{el.id}}, 'startRobot')">On</button>
+                    <button class="btn btn-secondary" onclick="SendRobotCmd({{el.id}}, 'stopRobot')">Off</button>
+                {% else %}
+                    <button class="btn btn-success" onclick="SendRobotCmd({{el.id}}, 'startRobot')">On</button>
+                    <button class="btn btn-secondary" onclick="SendRobotCmd({{el.id}}, 'stopRobot')">Off</button>
+                {% endif %}
+
+            {% else %}
+                <button class="btn btn-secondary" onclick="SendRobotCmd({{el.id}}, 'startRobot')">On</button>
+                <button class="btn btn-danger" onclick="SendRobotCmd({{el.id}}, 'stopRobot')">Off</button>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

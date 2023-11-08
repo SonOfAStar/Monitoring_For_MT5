@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Еженедельный отчёт
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+  <h2>
+       Еженедельный отчёт о доходности за период с  {{meta.week_start}} по {{meta.week_end}}.
+  </h2>
+</div>
+<br>
+
+<table class="table table-bordered table-sm">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Владелец счёта</th>
+          <th>Тип счёта</th>
+          <th>Ответственный за счёт</th>
+          <th>Начало фактического периода</th>
+          <th>Текущий баланс, руб</th>
+          <th>Доходность за последнюю неделю, %</th>
+          <th>Доходность за последнюю неделю, руб</th>
+          <th>Доходность за 4 недели, %</th>
+          <th>Доходность за 4 недели, руб</th>
+          <th>Фактическая доходность, %</th>
+          <th>Фактическая доходность, руб</th>
+          <th>Текущая Нормированая годовая доходность</th>
+        </tr>
+      </thead>
+    <tbody>
+    {% for el in account_info_table %}
+    <tr>
+        <td>
+            {{ forloop.counter }}
+        </td>
+        <td>
+            <!-- owner -->
+            <p data-toggle="tooltip" data-container="p" title="{{ el.number }}">
+                {{ el.owner }}
+            </p >
+        </td>
+        <td>
+            <!-- account type -->
+            {{ el.type }}
+        </td>
+        <td>
+            <!-- responsible person -->
+            {{ el.responsible }}
+        </td>
+        <td>
+            <!-- period start -->
+            {{ el.period_start }}
+        </td>
+        <td>
+            <p data-toggle="tooltip" data-container="p" title="{{ el.last_account_deal }}">
+<!--                <figure class="text-end">-->
+                    <!-- balance -->
+                    {{ el.last_account_state_str }}
+<!--                </figure>-->
+            </p >
+        </td>
+        {% if el.week_success == 1 %}
+            <td class="table-success">
+                <figure class="text-end">
+                    <!-- week profit percent -->
+                    {{ el.week_profit_percent }}
+                </figure>
+            </td>
+            <td class="table-success">
+                <figure class="text-end">
+                    <!-- week profit -->
+                    {{ el.week_profit_str }}
+                </figure>
+            </td>
+        {% elif el.week_success == -1 %}
+            <td class="table-danger">
+                <figure class="text-end">
+                    <!-- week profit percent -->
+                    {{ el.week_profit_percent }}
+                </figure>
+            </td>
+            <td class="table-danger">
+                <figure class="text-end">
+                    <!-- week profit -->
+                    {{ el.week_profit_str }}
+                </figure>
+            </td>
+        {% else %}
+            <td>
+                <figure class="text-end">
+                    <!-- week profit percent -->
+                    {{ el.week_profit_percent }}
+                </figure>
+            </td>
+            <td>
+                <figure class="text-end">
+                    <!-- week profit -->
+                    {{ el.week_profit_str }}
+                </figure>
+            </td>
+        {% endif %}
+
+        {% if el.four_week_success == 1 %}
+            <td class="table-success">
+                <figure class="text-end">
+                    <!-- 4 week profit percent -->
+                    {{ el.four_week_profit_percent }}
+                </figure>
+            </td>
+            <td class="table-success">
+                <figure class="text-end">
+                    <!-- 4 week profit -->
+                    {{ el.four_week_profit_str }}
+                </figure>
+            </td>
+        {% elif el.four_week_success == -1 %}
+            <td class="table-danger">
+                <figure class="text-end">
+                    <!-- 4 week profit percent -->
+                    {{ el.four_week_profit_percent }}
+                </figure>
+            </td>
+            <td class="table-danger">
+                <figure class="text-end">
+                    <!-- 4 week profit -->
+                    {{ el.four_week_profit_str }}
+                </figure>
+            </td>
+        {% else %}
+            <td>
+                <figure class="text-end">
+                    <!-- 4 week profit percent -->
+                    {{ el.four_week_profit_percent }}
+                </figure>
+            </td>
+            <td>
+                 <figure class="text-end">
+                    <!-- 4 week profit -->
+                    {{ el.four_week_profit_str }}
+                </figure>
+            </td>
+        {% endif %}
+
+        {% if el.period_success == 1 %}
+            <td class="table-success">
+                <figure class="text-end">
+                <!-- period profit -->
+                    {{ el.period_profit_percent }}
+                </figure>
+            </td>
+            <td class="table-success">
+                <figure class="text-end">
+                <!-- period profit -->
+                    {{ el.period_profit_str }}
+                </figure>
+            </td>
+        {% elif el.period_success == -1 %}
+            <td class="table-danger">
+                <figure class="text-end">
+                <!-- period profit -->
+                    {{ el.period_profit_percent }}
+                </figure>
+            </td>
+            <td class="table-danger">
+                <figure class="text-end">
+                <!-- period profit -->
+                    {{ el.period_profit_str }}
+                </figure>
+            </td>
+        {% else %}
+            <td>
+                <figure class="text-end">
+                <!-- period profit -->
+                    {{ el.period_profit_percent }}
+                </figure>
+            </td>
+            <td>
+                <figure class="text-end">
+                <!-- period profit -->
+                    {{ el.period_profit_str }}
+                </figure>
+            </td>
+        {% endif %}
+
+        {% if el.yearly_normalised_success == 1 %}
+            <td class="table-success">
+                <figure class="text-end">
+                <!-- yearly normalised profit percent -->
+                    {{ el.yearly_normalised_profit_percent }}
+                </figure>
+            </td>
+        {% elif el.yearly_normalised_success == -1 %}
+            <td class="table-danger">
+                <figure class="text-end">
+                <!-- yearly normalised profit percent -->
+                    {{ el.yearly_normalised_profit_percent }}
+                </figure>
+            </td>
+        {% else %}
+            <td>
+                <figure class="text-end">
+                <!-- yearly normalised profit percent -->
+                    {{ el.yearly_normalised_profit_percent }}
+                </figure>
+            </td>
+        {% endif %}
+
+    </tr>
+    {% endfor %}
+    <tr>
+        <th colspan="5">Итого</th>
+
+        <td>
+            <figure class="text-end">
+                {{ meta.state_sum_str }}
+            </figure>
+        </td>
+
+        {% if meta.current_week_profit > 0 %}
+            <td colspan="2" class="table-success">
+                <figure class="text-end">
+                    {{ meta.current_week_profit_str }}
+                </figure>
+            </td>
+        {% elif meta.current_week_profit < 0 %}
+            <td colspan="2" class="table-danger">
+                <figure class="text-end">
+                    {{ meta.current_week_profit_str }}
+                </figure>
+            </td>
+        {% else %}
+            <td colspan="2">
+                <figure class="text-end">
+                    {{ meta.current_week_profit_str }}
+                </figure>
+            </td>
+        {% endif %}
+
+        {% if meta.four_week_profit > 0 %}
+            <td colspan="2" class="table-success">
+                <figure class="text-end">
+                    {{ meta.four_week_profit_str }}
+                </figure>
+            </td>
+        {% elif meta.four_week_profit < 0 %}
+            <td colspan="2" class="table-danger">
+                <figure class="text-end">
+                    {{ meta.four_week_profit_str }}
+                </figure>
+            </td>
+        {% else %}
+            <td colspan="2">
+                <figure class="text-end">
+                    {{ meta.four_week_profit_str }}
+                </figure>
+            </td>
+        {% endif %}
+
+        {% if meta.period_profit > 0 %}
+            <td colspan="2" class="table-success">
+                <figure class="text-end">
+                    {{ meta.period_profit_str }}
+                </figure>
+            </td>
+        {% elif meta.period_profit < 0 %}
+            <td colspan="2" class="table-danger">
+                <figure class="text-end">
+                    {{ meta.period_profit_str }}
+                </figure>
+            </td>
+        {% else %}
+            <td colspan="2">
+                <figure class="text-end">
+                    {{ meta.period_profit_str }}
+                </figure>
+            </td>
+        {% endif %}
+
+    </tr>
+  </tbody>
+</table>
+
+<table class="table">
+    <tr>
+        <td>
+            <a href="/accounts/report/{{ meta.prev_week }}"> Предыдущая неделя</a>
+        </td>
+        <td>
+            <figure class="text-end">
+                {% if meta.next_week_applied %}
+                <a href="/accounts/report/{{ meta.next_week }}"> Следующая неделя </a>
+                {% endif %}
+            </figure>
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Учёт ввода ДС
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function SelectedToAccount(mode) {
+        let request = new XMLHttpRequest();
+        let url = "/accounts/accept_deals/";
+        let csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Set csrf_token !!!
+        let deal_array = document.querySelectorAll('.form-check-input, :checked');
+        var deal_id_array = [];
+
+        for (var i = 0; i < deal_array.length; i++){
+                if(deal_array[i].checked){
+                    deal_id_array = deal_id_array.concat(deal_array[i].id);
+                    deal_array[i].checked = false;
+                }
+
+        }
+
+        let params = "deals=[" + deal_id_array.join(",") + "]&mode=" + mode +
+            "&account_id=" + {{account.id}} + "&csrfmiddlewaretoken=" + csrftoken;
+            console.log(params)
+
+        // Асинхронный POST запрос по адресу url
+        request.open("POST", url, true);
+        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        // Добавляем обработчик события для получения асинхронного ответа
+        request.addEventListener("readystatechange", () => {
+
+          if(request.readyState === 4) {
+                    location.reload();
+                    return false;
+          }
+        });
+        //      Выполняем запрос.
+        request.send(params);
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+
+<a>
+    <h2>Учёт сделок по аккаунту №{{account.name}} {{account.owner}}</h2>
+
+
+    <table class="table table-bordered table-sm">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>День</th>
+          <th>Сделка</th>
+          <th>Время сделки</th>
+          <th>Объём ДС</th>
+          <th>Выбрано</th>
+        </tr>
+      </thead>
+    <tbody>
+    {% for day in table.days %}
+    <tr>
+        <th>
+            {{ forloop.counter }}
+        </th>
+        <td>
+            <!-- day -->
+            {{ day.day }}
+        </td>
+        <td colspan="4">
+            <table class="table table-bordered table-sm">
+                {% for deal in day.deals %}
+                    {% if deal.meta.accounted %}
+                        <tr class="table-success">
+                    {% elif deal.meta.is_extreme and day.meta.avg %}
+                        <tr class="table-danger">
+                    {% else %}
+                        <tr>
+                    {% endif %}
+                        <td>{{ deal.ticket }}</td>
+                        <td>{{ deal.time }}</td>
+                        <td>{{ deal.profit }}</td>
+                        <td>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" value="" id="{{deal.ticket}}">
+                              <label class="form-check-label" for="{{deal.ticket}}">
+                                Учесть
+                              </label>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+
+    </table>
+
+    <div class="btn-group fixed-bottom">
+      <button class="btn btn-danger" onclick="SelectedToAccount(-1)">Снять с учёта</button>
+      <button class="btn btn-success" onclick="SelectedToAccount(1)">Учесть</button>
+    </div>
+</a>
+
+{% endblock %}

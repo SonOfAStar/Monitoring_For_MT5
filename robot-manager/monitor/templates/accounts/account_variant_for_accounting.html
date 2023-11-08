@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Выбор счёта
+{% endblock %}
+
+
+{% block content %}
+    <h2>Выберите счёт для проверки на ввод/вывод ДС</h2>
+
+
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Владелец счёта</th>
+          <th>Тип счёта</th>
+          <th>Номер счёта</th>
+
+        </tr>
+      </thead>
+    <tbody>
+    {% for el in accounts %}
+    <tr>
+        <td>
+            {{ forloop.counter }}
+        </td>
+        <td>
+            <!-- owner -->
+            <a href="/accounts/account_deals_for/{{ el.id }}" class="button">{{el.owner}}</a>
+        </td>
+        <td>
+            <!-- account type -->
+            {{ el.type }}
+        </td>
+        <td>
+            <!-- balance -->
+            {{ el.name }}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+{% endblock %}
